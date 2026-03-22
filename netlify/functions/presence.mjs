@@ -1,7 +1,7 @@
-﻿import { getStore } from "@netlify/blobs";
+import { getStore } from "@netlify/blobs";
 
 const store = getStore("presence");
-const TTL_MS = 45000;
+const TTL_MS = 15000;
 
 const json = (data, status = 200) =>
   new Response(JSON.stringify(data), {
@@ -55,3 +55,4 @@ export default async (request) => {
   const online = await countActiveVisitors();
   return json({ online });
 };
+
