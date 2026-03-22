@@ -1,0 +1,103 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FuckSWILL</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="background-glow glow-left"></div>
+  <div class="background-glow glow-right"></div>
+  <div class="stars"></div>
+
+  <main class="landing">
+    <section class="hero-card">
+      <div class="online-bar">
+        <span class="online-dot"></span>
+        <span class="online-label">Online</span>
+        <strong id="onlineCount">...</strong>
+        <span class="online-max">/ 200</span>
+      </div>
+
+      <div class="logo-cluster" aria-hidden="true">
+        <div class="gear gear-small left">
+          <div class="gear-inner wheel-a"></div>
+        </div>
+
+        <div class="gear gear-main">
+          <div class="gear-inner person-mark">
+            <div class="head"></div>
+            <div class="hoodie"></div>
+          </div>
+        </div>
+
+        <div class="gear gear-small right">
+          <div class="gear-inner wheel-b"></div>
+        </div>
+      </div>
+
+      <p class="eyebrow">official links</p>
+      <h1>FuckSWILL</h1>
+      <p class="subtitle">Official page with direct links and a live visitor counter.</p>
+
+      <div class="socials">
+        <a class="social-btn telegram" href="https://t.me/FuckSWILL" target="_blank" rel="noopener noreferrer">
+          <span class="social-label">Telegram</span>
+          <span class="social-link">t.me/FuckSWILL</span>
+        </a>
+
+        <a class="social-btn tiktok" href="https://www.tiktok.com/@fuckswill" target="_blank" rel="noopener noreferrer">
+          <span class="social-label">TikTok</span>
+          <span class="social-link">@fuckswill</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const onlineElement = document.getElementById('onlineCount');
+      const storageKey = 'fuckswill_presence_session';
+      const createId = () => {
+        if (window.crypto && crypto.randomUUID) {
+          return crypto.randomUUID();
+        }
+        return 'session-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+      };
+
+      let sessionId = localStorage.getItem(storageKey);
+      if (!sessionId) {
+        sessionId = createId();
+        localStorage.setItem(storageKey, sessionId);
+      }
+
+      const syncPresence = async () => {
+        try {
+          const response = await fetch('/.netlify/functions/presence', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ sessionId })
+          });
+
+          if (!response.ok) {
+            throw new Error('Presence request failed');
+          }
+
+          const data = await response.json();
+          if (typeof data.online === 'number') {
+            onlineElement.textContent = Math.min(data.online, 200);
+          }
+        } catch (error) {
+          onlineElement.textContent = '--';
+        }
+      };
+
+      syncPresence();
+      setInterval(syncPresence, 20000);
+    })();
+  </script>
+</body>
+</html>

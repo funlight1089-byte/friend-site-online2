@@ -1,0 +1,8 @@
+﻿{
+  "name": "friend-site-netlify-online",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@netlify/blobs": "latest"
+  }
+}
